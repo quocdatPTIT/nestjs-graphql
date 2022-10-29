@@ -5,7 +5,6 @@ import { LoginDto } from '../dtos/login.dto';
 import { AuthService } from '../services/auth.service';
 
 @ApiTags('auth')
-@ApiBasicAuth()
 @Controller('/auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
