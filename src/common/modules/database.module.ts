@@ -15,7 +15,7 @@ import { RoleEntity } from '../../users/entities/role.entity';
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
         host: configService.get('DATABASE_HOST'),
-        port: configService.get('PORT'),
+        port: configService.get('DB_PORT'),
         username: configService.get('DATABASE_USERNAME'),
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_NAME'),
