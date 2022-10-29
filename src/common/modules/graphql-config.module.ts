@@ -12,6 +12,8 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
         'graphql-ws': true,
         'subscriptions-transport-ws': true,
       },
+      playground: true,
+      introspection: true,
     }),
   ],
 })
