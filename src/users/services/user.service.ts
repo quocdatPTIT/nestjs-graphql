@@ -8,6 +8,7 @@ import { GraphQLError } from 'graphql/error';
 import { UpdateUserInput } from '../input/update-user.input';
 import { UserStatusEnum } from '../enums/user-status.enum';
 import { UserStatusInput } from '../input/user-status.input';
+import { PasswordUtils } from '../../common/utils/password.utils';
 
 @Injectable()
 export class UserService {
@@ -38,7 +39,7 @@ export class UserService {
     newUser.fullName = fullName;
     newUser.username = username;
     newUser.email = email;
-    newUser.password = password;
+    newUser.password = await PasswordUtils.hashPassword(password);
     newUser.email = email;
     newUser.userType = userType;
 
@@ -57,7 +58,8 @@ export class UserService {
     dbUser.fullName = fullName || dbUser.fullName;
     dbUser.username = username || dbUser.username;
     dbUser.email = email || dbUser.email;
-    dbUser.password = password || dbUser.password;
+    dbUser.password =
+      (await PasswordUtils.hashPassword(password)) || dbUser.password;
 
     return await this.userRepository.save(dbUser);
   }
@@ -90,7 +92,6 @@ export class UserService {
   }
 
   private async getUserById(id: string) {
-    console.log(await this.userRepository.find());
     const dbUser = await this.userRepository.findOne({
       where: {
         id: id,
