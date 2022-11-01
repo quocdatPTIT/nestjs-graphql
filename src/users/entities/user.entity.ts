@@ -10,7 +10,7 @@ import { RoleEntity } from './role.entity';
 @ObjectType()
 export class UserEntity extends BaseEntity {
   @Column({ name: 'full_name' })
-  @Field({ name: 'full_name' })
+  @Field()
   fullName: string;
 
   @Column()
@@ -25,8 +25,8 @@ export class UserEntity extends BaseEntity {
   @Field()
   password: string;
 
-  @Column({ name: 'user_type' })
-  @Field({ name: 'user_type' })
+  @Column({ name: 'user_type', nullable: true })
+  @Field((type) => UserTypeEnum)
   userType: UserTypeEnum;
 
   @ManyToMany((type) => RoleEntity)
