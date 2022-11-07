@@ -36,6 +36,7 @@ export class AuthService {
     }
 
     const payload = {
+      userId: dbUser.id,
       username: dbUser.username,
       fullName: dbUser.fullName,
       userType: dbUser.userType,
@@ -45,5 +46,15 @@ export class AuthService {
     return {
       access_token: await this.jwtService.signAsync(payload),
     };
+  }
+
+  async getUserByJwt(userId: string) {
+    return await this.userRepository.findOne({
+      where: {
+        id: userId,
+        isDeleted: false,
+        isPublic: true,
+      },
+    });
   }
 }
