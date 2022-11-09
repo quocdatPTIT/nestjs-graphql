@@ -9,10 +9,11 @@ import { RoleEntity } from '../users/entities/role.entity';
 import { PermissionEntity } from '../users/entities/permission.entity';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from './guards/jwt.guard';
+import { GqlAuthGuard } from './guards/graphql.guard';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, JwtAuthGuard],
+  providers: [AuthService, JwtStrategy, JwtAuthGuard, GqlAuthGuard],
   imports: [
     JwtModule.register({
       secret: 'dattq.bank',

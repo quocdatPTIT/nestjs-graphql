@@ -1,9 +1,10 @@
 import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql';
 import { ConfigService } from '@nestjs/config';
-import { Inject } from '@nestjs/common';
+import { Inject, UseGuards } from '@nestjs/common';
 import { PubSub } from 'graphql-subscriptions';
 
 import StringConstant from '../../common/constant/string.constant';
+import { GqlAuthGuard } from '../../auth/guards/graphql.guard';
 
 import { ContactEntity } from '../entities/contact.entity';
 import { ContactService } from '../services/contact.service';
@@ -21,6 +22,7 @@ export class ContactResolver {
   ) {}
 
   @Query((returns) => [ContactEntity])
+  @UseGuards(GqlAuthGuard)
   async getPublishContacts() {
     return await this.contactService.getPublishContacts();
   }
