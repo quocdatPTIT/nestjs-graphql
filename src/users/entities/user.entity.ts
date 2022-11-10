@@ -29,6 +29,7 @@ export class UserEntity extends BaseEntity {
   @Field((type) => UserTypeEnum)
   userType: UserTypeEnum;
 
+  @Field((type) => [RoleEntity], { nullable: true })
   @ManyToMany((type) => RoleEntity)
   @JoinTable({
     name: 'cm_user_roles',

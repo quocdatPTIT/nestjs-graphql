@@ -11,7 +11,7 @@ export abstract class BaseEntity {
   @Field({ name: 'is_deleted', nullable: true })
   isDeleted: boolean;
 
-  @Column({ name: 'is_public', default: false })
+  @Column({ name: 'is_public', default: true })
   @Field({ name: 'is_public' })
   isPublic: boolean;
 }

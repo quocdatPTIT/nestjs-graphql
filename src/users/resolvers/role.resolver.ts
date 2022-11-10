@@ -3,6 +3,7 @@ import { RoleEntity } from '../entities/role.entity';
 import { RoleService } from '../services/role.service';
 import { CreateRoleInput } from '../input/create-role.input';
 import { UpdateRoleInput } from '../input/update-role.input';
+import { AssignPermissionInput } from '../input/assign-permission.input';
 
 @Resolver((of) => RoleEntity)
 export class RoleResolver {
@@ -33,5 +34,12 @@ export class RoleResolver {
   @Query((returns) => [RoleEntity])
   async getAllRole() {
     return await this.roleService.getAllRole();
+  }
+
+  @Mutation((returns) => RoleEntity)
+  async assignPermissions(
+    @Args('assignPermissionInput') assignPermissionInput: AssignPermissionInput,
+  ) {
+    return await this.roleService.assignPermissions(assignPermissionInput);
   }
 }

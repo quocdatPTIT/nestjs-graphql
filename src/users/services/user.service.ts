@@ -1,20 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { GraphQLError } from 'graphql/error';
+
+import { PasswordUtils } from '../../common/utils/password.utils';
 
 import { UserEntity } from '../entities/user.entity';
-import { CreateUserInput } from '../input/create-user.input';
-import { GraphQLError } from 'graphql/error';
-import { UpdateUserInput } from '../input/update-user.input';
+import { RoleEntity } from '../entities/role.entity';
 import { UserStatusEnum } from '../enums/user-status.enum';
+import { CreateUserInput } from '../input/create-user.input';
 import { UserStatusInput } from '../input/user-status.input';
-import { PasswordUtils } from '../../common/utils/password.utils';
+import { UpdateUserInput } from '../input/update-user.input';
+import { AssignRoleInput } from '../input/assign-role.input';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    @InjectRepository(RoleEntity)
+    private roleRepository: Repository<RoleEntity>,
   ) {}
 
   async createUser(createUserInput: CreateUserInput) {
@@ -89,6 +94,55 @@ export class UserService {
         isPublic: true,
       },
     });
+  }
+
+  async assignRoles(input: AssignRoleInput) {
+    const { userId, roleIds } = input;
+    const dbUser = await this.getUserById(userId);
+
+    let roles: RoleEntity[] = [];
+
+    try {
+      roles = await this.validateRoles(roleIds);
+    } catch (err) {
+      throw new GraphQLError(`${err}`);
+    }
+
+    if (roles.length > 0) {
+      await this.deleteUserRoles(dbUser);
+      dbUser.roles = roles;
+    }
+
+    return this.userRepository.save(dbUser);
+  }
+
+  private async deleteUserRoles(user: UserEntity) {
+    user.roles = [];
+
+    await this.userRepository.save(user);
+  }
+
+  private async validateRoles(roleIds: string[]) {
+    const promise: Promise<RoleEntity[]> = new Promise(
+      async (resolve, reject) => {
+        const roles = roleIds.map(async (id) => {
+          const role = await this.roleRepository.findOne({
+            where: {
+              id,
+              isDeleted: false,
+            },
+          });
+          if (!role) {
+            reject(`Role: ${id} not found`);
+          }
+
+          return role;
+        });
+        const roleEntities = await Promise.all(roles);
+        resolve(roleEntities);
+      },
+    );
+    return promise;
   }
 
   private async getUserById(id: string) {

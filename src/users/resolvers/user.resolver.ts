@@ -5,6 +5,7 @@ import { UserService } from '../services/user.service';
 import { CreateUserInput } from '../input/create-user.input';
 import { UpdateUserInput } from '../input/update-user.input';
 import { UserStatusInput } from '../input/user-status.input';
+import { AssignRoleInput } from '../input/assign-role.input';
 
 @Resolver((of) => UserEntity)
 export class UserResolver {
@@ -33,5 +34,10 @@ export class UserResolver {
   @Query((returns) => [UserEntity])
   async getUsers() {
     return await this.userService.getUsers();
+  }
+
+  @Mutation((returns) => UserEntity)
+  async assignRoles(@Args('assignRoleInput') assignRoleInput: AssignRoleInput) {
+    return await this.userService.assignRoles(assignRoleInput);
   }
 }
