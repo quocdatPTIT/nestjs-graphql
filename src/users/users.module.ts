@@ -1,3 +1,4 @@
+import { UserController } from './controllers/user.controller';
 import { Module, OnModuleInit } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -11,6 +12,7 @@ import { PermissionEntity } from './entities/permission.entity';
 import { PermissionService } from './services/permission.service';
 
 @Module({
+  controllers: [UserController],
   imports: [
     TypeOrmModule.forFeature([UserEntity, RoleEntity, PermissionEntity]),
   ],
