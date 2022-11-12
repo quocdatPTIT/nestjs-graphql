@@ -1,26 +1,36 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
+
+import { RoleCodeEnum } from '../../common/enums/role-code.enum';
+
 import { PermissionEntity } from '../entities/permission.entity';
-import { Repository } from 'typeorm';
 import { PermissionGroupEnum } from '../enums/permission-group.enum';
+import { UserEntity } from '../entities/user.entity';
 
 @Injectable()
 export class PermissionService {
   constructor(
     @InjectRepository(PermissionEntity)
     private permissionRepository: Repository<PermissionEntity>,
+    @InjectDataSource()
+    private dataSource: DataSource,
   ) {}
 
   async seedPermissions() {
+    this.dataSource
+      .getRepository(UserEntity)
+      .createQueryBuilder('user')
+      .innerJoin('user.roles', 'role').where('role.user', {}).innerJoin()
     const permissions = [
       {
-        code: 'CREATE_CONTACT',
+        code: RoleCodeEnum.CREATE_CONTACT,
         displayName: 'Create contact',
         description: 'Create for contact',
         permissionGroup: PermissionGroupEnum.CREATE_CONTACT,
       },
       {
-        code: 'UPDATE_CONTACT',
+        code: RoleCodeEnum.UPDATE_CONTACT,
         displayName: 'Update contact',
         description: 'Update for contact',
         permissionGroup: PermissionGroupEnum.UPDATE_CONTACT,

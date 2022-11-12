@@ -72,7 +72,7 @@ export class RoleService {
     if (permissions.length > 0) {
       await this.deleteRolePermissions(dbRole.id);
 
-      dbRole.permission = permissions;
+      dbRole.permissions = permissions;
     }
 
     return this.roleRepository.save(dbRole);

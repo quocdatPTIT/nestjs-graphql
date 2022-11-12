@@ -1,0 +1,4 @@
+export enum RoleCodeEnum {
+  CREATE_CONTACT = 'CREATE_CONTACT',
+  UPDATE_CONTACT = 'UPDATE_CONTACT',
+}
