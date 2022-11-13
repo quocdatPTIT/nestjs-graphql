@@ -7,7 +7,7 @@ export class UserController {
 
   @Get(':userId')
   async getRoleForUser(@Param('userId') userId: string) {
-    const data = await this.userService.getUserPermissions(userId);
-    return data;
+    // const data = await this.userService.getUserPermissions(userId);
+    // return data;
   }
 }

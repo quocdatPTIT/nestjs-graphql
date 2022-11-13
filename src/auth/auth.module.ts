@@ -1,3 +1,4 @@
+import { PermissionGuard } from './guards/permission.guard';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
@@ -13,15 +14,22 @@ import { GqlAuthGuard } from './guards/graphql.guard';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, JwtAuthGuard, GqlAuthGuard],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    JwtAuthGuard,
+    GqlAuthGuard,
+    PermissionGuard,
+  ],
   imports: [
     JwtModule.register({
       secret: 'dattq.bank',
       signOptions: {
-        expiresIn: 3600,
+        expiresIn: '1d',
       },
     }),
     TypeOrmModule.forFeature([UserEntity, RoleEntity, PermissionEntity]),
   ],
+  exports: [AuthService],
 })
 export class AuthModule {}

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { GraphQLError } from 'graphql/error';
 
 import { PasswordUtils } from '../../common/utils/password.utils';
@@ -20,8 +20,6 @@ export class UserService {
     private userRepository: Repository<UserEntity>,
     @InjectRepository(RoleEntity)
     private roleRepository: Repository<RoleEntity>,
-    @InjectDataSource()
-    private dataSource: DataSource,
   ) {}
 
   async createUser(createUserInput: CreateUserInput) {
@@ -116,20 +114,6 @@ export class UserService {
     }
 
     return this.userRepository.save(dbUser);
-  }
-
-  async getUserPermissions(userId: string) {
-    const queryResult = await this.dataSource
-      .createQueryBuilder('cm_users', 'u')
-      .where('u.id = :userId', { userId })
-      .select('p.code as p_code')
-      .groupBy('p.code, u.id')
-      .innerJoin('cm_user_roles', 'us', 'u.id = us.user_id')
-      .innerJoin('cm_role_permissions', 'rp', 'rp.role_id = us.role_id')
-      .innerJoin('cm_permissions', 'p', 'p.id = rp.permission_id')
-      .getRawMany();
-
-    return queryResult.map((item) => item['p_code']);
   }
 
   private async deleteUserRoles(user: UserEntity) {

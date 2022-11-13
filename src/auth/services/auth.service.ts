@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 
 import { UserEntity } from '../../users/entities/user.entity';
 
@@ -14,6 +14,8 @@ export class AuthService {
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
     private jwtService: JwtService,
+    @InjectDataSource()
+    private dataSource: DataSource,
   ) {}
 
   async login({ username, password }: LoginDto) {
@@ -55,6 +57,21 @@ export class AuthService {
         isDeleted: false,
         isPublic: true,
       },
+      select: ['id', 'fullName', 'email', 'username', 'userType'],
     });
+  }
+
+  async getUserPermissions(userId: string) {
+    const queryResult = await this.dataSource
+      .createQueryBuilder('cm_users', 'u')
+      .where('u.id = :userId', { userId })
+      .select('p.code as p_code')
+      .groupBy('p.code, u.id')
+      .innerJoin('cm_user_roles', 'us', 'u.id = us.user_id')
+      .innerJoin('cm_role_permissions', 'rp', 'rp.role_id = us.role_id')
+      .innerJoin('cm_permissions', 'p', 'p.id = rp.permission_id')
+      .getRawMany();
+
+    return queryResult.map((item) => item['p_code']);
   }
 }

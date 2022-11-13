@@ -3,8 +3,12 @@ import { ConfigService } from '@nestjs/config';
 import { Inject, UseGuards } from '@nestjs/common';
 import { PubSub } from 'graphql-subscriptions';
 
+import { PermissionGroupEnum } from './../../users/enums/permission-group.enum';
+import { PermissionGuard } from './../../auth/guards/permission.guard';
+
 import StringConstant from '../../common/constant/string.constant';
 import { GqlAuthGuard } from '../../auth/guards/graphql.guard';
+import { HasPermission } from '../../users/decorators/has-permission.decorator';
 
 import { ContactEntity } from '../entities/contact.entity';
 import { ContactService } from '../services/contact.service';
@@ -63,6 +67,8 @@ export class ContactResolver {
   }
 
   // Create Contact
+  @UseGuards(GqlAuthGuard, PermissionGuard)
+  @HasPermission(PermissionGroupEnum.CREATE_CONTACT)
   @Mutation((returns) => ContactEntity)
   async createContact(@Args('contactInput') contactInput: ContactInput) {
     const newContact = await this.contactService.createContact(contactInput);

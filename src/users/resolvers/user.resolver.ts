@@ -6,6 +6,8 @@ import { CreateUserInput } from '../input/create-user.input';
 import { UpdateUserInput } from '../input/update-user.input';
 import { UserStatusInput } from '../input/user-status.input';
 import { AssignRoleInput } from '../input/assign-role.input';
+import { HasPermission } from '../decorators/has-permission.decorator';
+import { PermissionGroupEnum } from '../enums/permission-group.enum';
 
 @Resolver((of) => UserEntity)
 export class UserResolver {
@@ -32,6 +34,7 @@ export class UserResolver {
   }
 
   @Query((returns) => [UserEntity])
+  @HasPermission(PermissionGroupEnum.CREATE_CONTACT)
   async getUsers() {
     return await this.userService.getUsers();
   }
