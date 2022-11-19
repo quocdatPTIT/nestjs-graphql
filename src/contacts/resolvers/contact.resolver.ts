@@ -3,8 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { Inject, UseGuards } from '@nestjs/common';
 import { PubSub } from 'graphql-subscriptions';
 
-import { PermissionGroupEnum } from './../../users/enums/permission-group.enum';
-import { PermissionGuard } from './../../auth/guards/permission.guard';
+import { PermissionGroupEnum } from '../../users/enums/permission-group.enum';
+import { PermissionGuard } from '../../auth/guards/permission.guard';
 
 import StringConstant from '../../common/constant/string.constant';
 import { GqlAuthGuard } from '../../auth/guards/graphql.guard';
@@ -16,6 +16,7 @@ import { ContactInput } from '../input/contact.input';
 import { ContactStatusInput } from '../input/contact-status.input';
 
 @Resolver((of) => ContactEntity)
+@HasPermission(PermissionGroupEnum.ALL_PERMISSION_CONTACT)
 export class ContactResolver {
   constructor(
     private contactService: ContactService,
@@ -32,18 +33,24 @@ export class ContactResolver {
   }
 
   // Get All Contacts
+  @UseGuards(GqlAuthGuard, PermissionGuard)
+  @HasPermission(PermissionGroupEnum.VIEW_CONTACT)
   @Query((returns) => [ContactEntity])
   async getAllContacts() {
     return await this.contactService.getAllContacts();
   }
 
   // Get Single Contacts
+  @UseGuards(GqlAuthGuard, PermissionGuard)
+  @HasPermission(PermissionGroupEnum.VIEW_CONTACT)
   @Query((returns) => ContactEntity)
   async getSingleContacts(@Args('contactId') contactId: string) {
     return await this.contactService.getSingleContact(contactId);
   }
 
   // Update Contact
+  @UseGuards(GqlAuthGuard, PermissionGuard)
+  @HasPermission(PermissionGroupEnum.UPDATE_CONTACT)
   @Mutation((returns) => ContactEntity)
   async updateContact(
     @Args('contactId') contactId: string,
@@ -53,6 +60,8 @@ export class ContactResolver {
   }
 
   // Change Status Contact (Active or Inactive)
+  @UseGuards(GqlAuthGuard, PermissionGuard)
+  @HasPermission(PermissionGroupEnum.CHANGE_STATUS_CONTACT)
   @Mutation((returns) => ContactEntity)
   async changeStatusContact(
     @Args('contactStatusInput') contactStatusInput: ContactStatusInput,
@@ -61,6 +70,8 @@ export class ContactResolver {
   }
 
   // Delete Contact
+  @UseGuards(GqlAuthGuard, PermissionGuard)
+  @HasPermission(PermissionGroupEnum.DELETE_CONTACT)
   @Mutation((returns) => ContactEntity)
   async deleteContact(@Args('contactId') contactId: string) {
     return await this.contactService.deleteContact(contactId);

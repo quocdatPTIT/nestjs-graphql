@@ -27,14 +27,23 @@ export class PermissionGuard implements CanActivate {
       throw new UnauthorizedException('Invalid User');
     }
 
-    const permissionName = this.reflector.get<string>(
+    const accessMethod = this.reflector.get<string>(
       MetadataConstant.PERMISSION,
       context.getHandler(),
     );
 
+    const accessClass = this.reflector.get<string>(
+      MetadataConstant.PERMISSION,
+      context.getClass(),
+    );
+
     const dbPermissions = await this.authService.getUserPermissions(user.id);
 
-    if (!dbPermissions.some((p) => p === permissionName)) {
+    if (accessMethod && !dbPermissions.some((p) => p === accessMethod)) {
+      throw new ForbiddenException('Access Denied');
+    }
+
+    if (accessClass && !dbPermissions.some((p) => p === accessClass)) {
       throw new ForbiddenException('Access Denied');
     }
 
