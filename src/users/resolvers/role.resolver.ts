@@ -1,4 +1,9 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
+
+import { GqlAuthGuard } from '../../auth/guards/graphql.guard';
+import { PermissionGuard } from '../../auth/guards/permission.guard';
+
 import { RoleEntity } from '../entities/role.entity';
 import { RoleService } from '../services/role.service';
 import { CreateRoleInput } from '../input/create-role.input';
@@ -6,6 +11,7 @@ import { UpdateRoleInput } from '../input/update-role.input';
 import { AssignPermissionInput } from '../input/assign-permission.input';
 
 @Resolver((of) => RoleEntity)
+@UseGuards(GqlAuthGuard, PermissionGuard)
 export class RoleResolver {
   constructor(private roleService: RoleService) {}
 

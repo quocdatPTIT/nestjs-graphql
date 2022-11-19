@@ -25,6 +25,9 @@ export class UserEntity extends BaseEntity {
   @Field()
   password: string;
 
+  @Column({ name: 'refresh_token', nullable: true })
+  refreshToken: string;
+
   @Column({ name: 'user_type', nullable: true })
   @Field((type) => UserTypeEnum)
   userType: UserTypeEnum;

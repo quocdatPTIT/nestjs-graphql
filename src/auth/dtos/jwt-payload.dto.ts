@@ -4,4 +4,5 @@ export interface JwtPayloadDto {
   userType: string;
   userId: string;
   email: string;
+  refreshToken?: boolean;
 }

@@ -2,11 +2,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
-import { ContactEntity } from '../../contacts/entities/contact.entity';
-import { UserEntity } from '../../users/entities/user.entity';
-import { PermissionEntity } from '../../users/entities/permission.entity';
-import { RoleEntity } from '../../users/entities/role.entity';
-
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
@@ -19,7 +14,7 @@ import { RoleEntity } from '../../users/entities/role.entity';
         username: configService.get('DATABASE_USERNAME'),
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_NAME'),
-        entities: [ContactEntity, UserEntity, PermissionEntity, RoleEntity],
+        entities: ['dist/**/*.entity{.ts,.js}'],
         synchronize: true,
       }),
     }),

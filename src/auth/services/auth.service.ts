@@ -1,12 +1,17 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { DataSource, Repository } from 'typeorm';
 
 import { UserEntity } from '../../users/entities/user.entity';
+import { PasswordUtils } from '../../common/utils/password.utils';
 
 import { LoginDto } from '../dtos/login.dto';
-import { PasswordUtils } from '../../common/utils/password.utils';
+import { JwtPayloadDto } from '../dtos/jwt-payload.dto';
 
 @Injectable()
 export class AuthService {
@@ -45,9 +50,76 @@ export class AuthService {
       email: dbUser.email,
     };
 
+    const payloadRefreshToken = {
+      ...payload,
+      refreshToken: true,
+    };
+
+    const refreshToken = await this.jwtService.signAsync(payloadRefreshToken, {
+      expiresIn: '1d',
+    });
+
+    dbUser.refreshToken = await PasswordUtils.hashing(refreshToken);
+
+    await this.userRepository.save(dbUser);
+
     return {
       access_token: await this.jwtService.signAsync(payload),
+      refresh_token: refreshToken,
     };
+  }
+
+  async logout(user: JwtPayloadDto) {
+    const dbUser = await this.userRepository.findOne({
+      where: {
+        id: user.userId,
+      },
+    });
+
+    if (!dbUser) {
+      throw new InternalServerErrorException('Not found user');
+    }
+
+    dbUser.refreshToken = null;
+    await this.userRepository.save(dbUser);
+    return {
+      message: 'Logout successful',
+    };
+  }
+
+  async refreshToken(token: string) {
+    try {
+      const payload = this.jwtService.decode(token) as JwtPayloadDto;
+
+      const dbUser = await this.userRepository.findOne({
+        where: {
+          id: payload.userId,
+          username: payload.username,
+          isDeleted: false,
+          isPublic: true,
+        },
+      });
+
+      if (!dbUser) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      const hashedRefreshToken = dbUser.refreshToken;
+
+      if (hashedRefreshToken) {
+        throw new UnauthorizedException();
+      }
+
+      if (!(await PasswordUtils.hashCompare(token, hashedRefreshToken))) {
+        throw new UnauthorizedException();
+      }
+
+      return {
+        access_token: await this.jwtService.signAsync(payload),
+      };
+    } catch (e) {
+      throw new UnauthorizedException('Expired Refresh Token');
+    }
   }
 
   async getUserByJwt(userId: string) {

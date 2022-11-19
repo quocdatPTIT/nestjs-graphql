@@ -44,7 +44,7 @@ export class UserService {
     newUser.fullName = fullName;
     newUser.username = username;
     newUser.email = email;
-    newUser.password = await PasswordUtils.hashPassword(password);
+    newUser.password = await PasswordUtils.hashing(password);
     newUser.email = email;
     newUser.userType = userType;
 
@@ -64,7 +64,7 @@ export class UserService {
     dbUser.username = username || dbUser.username;
     dbUser.email = email || dbUser.email;
     dbUser.password =
-      (await PasswordUtils.hashPassword(password)) || dbUser.password;
+      (await PasswordUtils.hashing(password)) || dbUser.password;
 
     return await this.userRepository.save(dbUser);
   }

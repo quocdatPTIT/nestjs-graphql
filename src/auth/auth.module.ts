@@ -25,7 +25,7 @@ import { GqlAuthGuard } from './guards/graphql.guard';
     JwtModule.register({
       secret: 'dattq.bank',
       signOptions: {
-        expiresIn: '1d',
+        expiresIn: '15min',
       },
     }),
     TypeOrmModule.forFeature([UserEntity, RoleEntity, PermissionEntity]),
